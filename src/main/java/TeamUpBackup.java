@@ -1,28 +1,3 @@
-
-/*
-Java program that makes a backup copy of a Teamup calendar using the Teamup API and saves it as a JSON file:
-
-Add the necessary dependencies.
-Write the code to fetch the calendar events.
-Write the code to save the events to a JSON file.
-First, add the following dependencies to your pom.xml if you're using Maven:
-
-<dependencies>
-    <dependency>
-        <groupId>com.squareup.okhttp3</groupId>
-        <artifactId>okhttp</artifactId>
-        <version>4.9.1</version>
-    </dependency>
-    <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>2.8.6</version>
-    </dependency>
-</dependencies>
-
-Make sure to replace 'your_teamup_api_key', 'your_calendar_id', and '/path/to/backup.json' with your actual Teamup API key, calendar ID, and desired backup file path.
-
-*/
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -31,15 +6,15 @@ import com.google.gson.JsonObject;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import net.fortuna.ical4j.data.CalendarOutputter;
-import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.DtEnd;
-import net.fortuna.ical4j.model.property.DtStart;
-import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Summary;
-import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.model.property.Version;
+// import net.fortuna.ical4j.data.CalendarOutputter;
+// import net.fortuna.ical4j.model.Calendar;
+// import net.fortuna.ical4j.model.component.VEvent;
+// import net.fortuna.ical4j.model.property.DtEnd;
+// import net.fortuna.ical4j.model.property.DtStart;
+// import net.fortuna.ical4j.model.property.ProdId;
+// import net.fortuna.ical4j.model.property.Summary;
+// import net.fortuna.ical4j.model.property.Uid;
+// import net.fortuna.ical4j.model.property.Version;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,10 +22,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
+// import java.nio.charset.StandardCharsets;
+// import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -133,11 +108,11 @@ public class TeamUpBackup {
 
         // get current day, month and year as a string separated by a dash
         LocalDate date = LocalDate.now();
-        String backupFilePathIcs = "./backup-"
-                + calendarId + "-" + date.getYear()
-                + "-" + date.getMonthValue()
-                + "-" + date.getDayOfMonth()
-                + ".ics";
+        // String backupFilePathIcs = "./backup-"
+        //         + calendarId + "-" + date.getYear()
+        //         + "-" + date.getMonthValue()
+        //         + "-" + date.getDayOfMonth()
+        //         + ".ics";
         String backupFilePathCsv = "./backup-"
                 + calendarId + "-" + date.getYear()
                 + "-" + date.getMonthValue()
@@ -169,14 +144,14 @@ public class TeamUpBackup {
         //     logger.error("Error reading events example file: " + e.getMessage());
         //     System.exit(1);
         // }
-        try {
-            Files.writeString(Path.of(backupFilePathIcs),
-                    saveEventsToIcs(eventsJson),
-                    StandardOpenOption.CREATE);
-            logger.info("Events saved to " + backupFilePathIcs);
-        } catch (IOException e) {
-            logger.error("Error saving events to iCalendar file: " + e.getMessage());
-        }
+        // try {
+        //     Files.writeString(Path.of(backupFilePathIcs),
+        //             saveEventsToIcs(eventsJson),
+        //             StandardOpenOption.CREATE);
+        //     logger.info("Events saved to " + backupFilePathIcs);
+        // } catch (IOException e) {
+        //     logger.error("Error saving events to iCalendar file: " + e.getMessage());
+        // }
         try {
             Files.writeString(Path.of(backupFilePathCsv),
                     saveEventsToCsv(eventsJson, subCalendarsMap),
@@ -240,49 +215,6 @@ public class TeamUpBackup {
         }
     }
 
-    private static String saveEventsToIcs(String eventsJson) throws IOException {
-        String icsEventsString = null;
-        try (StringWriter sw = new StringWriter();
-                PrintWriter writer = new PrintWriter(sw)) {
-            Gson gson = new Gson();
-            JsonObject jsonObject = gson.fromJson(eventsJson, JsonObject.class);
-            JsonArray events = jsonObject.getAsJsonArray("events");
-
-            Calendar calendar = new Calendar();
-            calendar.add(new ProdId("-//Teamup//EN"));
-            Version v = new Version();
-            v.setValue(Version.VALUE_2_0);
-            calendar.add(v);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
-
-            for (int i = 0; i < events.size(); i++) {
-                JsonObject event = events.get(i).getAsJsonObject();
-                String uid = event.get("id").getAsString();
-                String summary = event.get("title").getAsString();
-                String start = event.get("start_dt").getAsString();
-                String end = event.get("end_dt").getAsString();
-
-                OffsetDateTime startDateTime = OffsetDateTime.parse(start, formatter);
-                OffsetDateTime endDateTime = OffsetDateTime.parse(end, formatter);
-
-                VEvent vEvent = new VEvent();
-                vEvent.add(new DtStart<OffsetDateTime>(startDateTime));
-                vEvent.add(new DtEnd<OffsetDateTime>(endDateTime));
-                vEvent.add(new Summary(summary));
-                vEvent.add(new Uid(uid));
-
-                calendar.add(vEvent);
-            }
-
-            CalendarOutputter outputter = new CalendarOutputter();
-            outputter.output(calendar, writer);
-            icsEventsString = sw.toString();
-        } catch (IOException e) {
-            logger.error("Error closing string writer: " + e.getMessage());
-        }
-        return icsEventsString;
-    }
-
     private static String saveEventsToCsv(String eventsJson, Map<Long, String> subCalendarsMap) throws IOException {
         String csvEventsString = null;
         try(StringWriter sw = new StringWriter(); PrintWriter writer = new PrintWriter(sw)){
@@ -333,6 +265,50 @@ public class TeamUpBackup {
         }
         return csvEventsString;
     }
+
+    // private static String saveEventsToIcs(String eventsJson) throws IOException {
+    //     String icsEventsString = null;
+    //     try (StringWriter sw = new StringWriter();
+    //             PrintWriter writer = new PrintWriter(sw)) {
+    //         Gson gson = new Gson();
+    //         JsonObject jsonObject = gson.fromJson(eventsJson, JsonObject.class);
+    //         JsonArray events = jsonObject.getAsJsonArray("events");
+
+    //         Calendar calendar = new Calendar();
+    //         calendar.add(new ProdId("-//Teamup//EN"));
+    //         Version v = new Version();
+    //         v.setValue(Version.VALUE_2_0);
+    //         calendar.add(v);
+    //         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+
+    //         for (int i = 0; i < events.size(); i++) {
+    //             JsonObject event = events.get(i).getAsJsonObject();
+    //             String uid = event.get("id").getAsString();
+    //             String summary = event.get("title").getAsString();
+    //             String start = event.get("start_dt").getAsString();
+    //             String end = event.get("end_dt").getAsString();
+
+    //             OffsetDateTime startDateTime = OffsetDateTime.parse(start, formatter);
+    //             OffsetDateTime endDateTime = OffsetDateTime.parse(end, formatter);
+
+    //             VEvent vEvent = new VEvent();
+    //             vEvent.add(new DtStart<OffsetDateTime>(startDateTime));
+    //             vEvent.add(new DtEnd<OffsetDateTime>(endDateTime));
+    //             vEvent.add(new Summary(summary));
+    //             vEvent.add(new Uid(uid));
+
+    //             calendar.add(vEvent);
+    //         }
+
+    //         CalendarOutputter outputter = new CalendarOutputter();
+    //         outputter.output(calendar, writer);
+    //         icsEventsString = sw.toString();
+    //     } catch (IOException e) {
+    //         logger.error("Error closing string writer: " + e.getMessage());
+    //     }
+    //     return icsEventsString;
+    // }
+
     // private static void saveEventsToFileJson(String eventsJson, String filePath)
     // {
     // try (FileWriter fileWriter = new FileWriter(filePath)) {

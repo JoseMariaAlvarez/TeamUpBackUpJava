@@ -5,7 +5,7 @@
     </encoder>
   </appender>
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file>./teamupbackup.log</file>
+    <file>${log.file.path}</file>
     <append>true</append>
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
