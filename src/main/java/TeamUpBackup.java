@@ -43,7 +43,6 @@ public class TeamUpBackup {
 
     private static final String API_URL = "https://api.teamup.com/";
     private final static String CONFIG_FILE_PATH = "./configuration.properties";
-    private final static String BACKUP_FILE_PATH_PREFIX = "./datos/backup-";
 
     private static final Logger logger = LoggerFactory.getLogger(TeamUpBackup.class);
 
@@ -53,6 +52,7 @@ public class TeamUpBackup {
         String calendarId = null;
         String startDate = null;
         String endDate = null;
+        String backupFilePathPrefix = null;
 
         logger.info("Starting Teamup backup {}", new Date());
         try {
@@ -62,6 +62,7 @@ public class TeamUpBackup {
             calendarId = (String) properties.getProperty("CALENDAR_ID", "");
             startDate = (String) properties.getProperty("START_DATE", "");
             endDate = (String) properties.getProperty("END_DATE", "");
+            backupFilePathPrefix = (String) properties.getProperty("BACKUP_FILE_PATH_PREFIX", "");
             if (apiKey.equals("")) {
                 logger.error("API key not found in configuration file {}", CONFIG_FILE_PATH);
                 System.exit(1);
@@ -76,6 +77,10 @@ public class TeamUpBackup {
             }
             if (endDate.equals("")) {
                 logger.error("End date not found in configuration file {}", CONFIG_FILE_PATH);
+                System.exit(1);
+            }
+            if (backupFilePathPrefix.equals("")) {
+                logger.error("Backup file path prefix not found in configuration file {}", CONFIG_FILE_PATH);
                 System.exit(1);
             }
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -112,7 +117,7 @@ public class TeamUpBackup {
         // + "-" + date.getMonthValue()
         // + "-" + date.getDayOfMonth()
         // + ".ics";
-        String backupFilePathCsv = BACKUP_FILE_PATH_PREFIX
+        String backupFilePathCsv = backupFilePathPrefix
                 + calendarId + "-" + date.getYear()
                 + "-" + date.getMonthValue()
                 + "-" + date.getDayOfMonth()

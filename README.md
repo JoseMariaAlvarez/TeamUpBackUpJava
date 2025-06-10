@@ -1,4 +1,4 @@
-Java project to make a security copy of a Team Up calendar, given an API key, the calendar id, and the initial and final dates, in YYYY-MM-DD format.
+Java project to make a security copy of a Team Up calendar, given an API key, the calendar id, and the initial and final dates, in YYYY-MM-DD format. These values are set in a configuration file, called configuration.properties. The path and prefix of the output CSV file is also in this file. 
 
 Calendar events are saved to a CSV file, one event per line, and a ICalc file. This latter version is to be improved.
 
@@ -13,6 +13,5 @@ The name of the backup file could also be defined in the logback.xml file as a p
 
 This value overrides the value defined as a system property with the -D option in console. I have still to check if the path style also depends on the operating system.
 
-Make sure that the folder for the output CSV file exists. Otherwise, an IOException will be thrown and the file will not be created. The path and prefix of the output CSV file is hardcoded in the java file. It should be moved to the configuration file in a later version.
 
 
